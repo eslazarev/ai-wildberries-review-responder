@@ -36,6 +36,9 @@ jobs:
           mkdir -p .github/badges
           anybadge --value=$score --file=.github/badges/pylint.svg --label=pylint --color=#007ec6 --overwrite
 
+      - name: Run Bandit security scan
+        run: bandit -r src
+
       - name: Run Radon maintainability and generate badge
         run: |
           radon mi src tests -s -j > radon-mi.json
