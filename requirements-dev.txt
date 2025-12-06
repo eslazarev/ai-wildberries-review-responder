@@ -5,3 +5,4 @@ pytest-archon>=0.0.7
 mypy
 radon
 anybadge
+pylint
