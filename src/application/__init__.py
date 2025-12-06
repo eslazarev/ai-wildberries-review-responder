@@ -7,4 +7,3 @@ Exposes ports and use cases that orchestrate domain logic independent from infra
 from __future__ import annotations
 
 __all__ = []
-

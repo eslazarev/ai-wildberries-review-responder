@@ -15,4 +15,3 @@ class LLMReplyGenerator:
     def generate(self, review: Review) -> str:
         prompt = self.prompt_builder.build(review)
         return self.llm_client.generate_reply(prompt)
-

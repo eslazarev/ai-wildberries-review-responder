@@ -35,5 +35,6 @@ def cron_handler(event: Dict[str, Any] | None = None, context: Any = None) -> Di
         "status": "ok",
     }
 
+
 if __name__ == "__main__":
     cron_handler()
