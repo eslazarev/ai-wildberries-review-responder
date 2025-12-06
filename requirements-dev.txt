@@ -2,3 +2,5 @@
 black>=24.3.0
 pytest>=8.0
 pytest-archon>=0.0.7
+mypy
+radon

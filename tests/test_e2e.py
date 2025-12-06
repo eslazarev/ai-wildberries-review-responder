@@ -6,12 +6,8 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Iterator, List
-from urllib import request as urllib_request
-from urllib.error import HTTPError, URLError
 
-import pytest
-
-pytest.importorskip("requests")
+import requests
 
 from src.application.llm import LLMClient
 from src.application.respond_on_reviews import respond_on_reviews
@@ -54,19 +50,13 @@ class FakeHTTPLLMClient(LLMClient):
         self.base_url = base_url.rstrip("/")
 
     def generate_reply(self, prompt: str) -> str:
-        data = json.dumps({"prompt": prompt}).encode("utf-8")
-        req = urllib_request.Request(
-            url=f"{self.base_url}/reply",
-            data=data,
-            headers={"Content-Type": "application/json"},
-            method="POST",
+        response = requests.post(
+            f"{self.base_url}/reply",
+            json={"prompt": prompt},
+            timeout=self.timeout,
         )
-        try:
-            with urllib_request.urlopen(req, timeout=self.timeout) as response:
-                body = response.read().decode("utf-8")
-        except (HTTPError, URLError) as exc:  # pragma: no cover - propagated
-            raise RuntimeError("LLM stub request failed") from exc
-        payload = json.loads(body)
+        response.raise_for_status()
+        payload = response.json()
         return payload["text"]
 
 
