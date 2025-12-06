@@ -10,6 +10,6 @@
   },
   "devDependencies": {
     "@yandex-cloud/serverless-plugin": "^1.7.25",
-    "serverless": "^3.38.0"
+    "serverless": "^4.27.0"
   }
 }
