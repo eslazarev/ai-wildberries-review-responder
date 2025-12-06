@@ -7,3 +7,4 @@ radon
 anybadge
 pylint
 pytest-cov
+bandit
