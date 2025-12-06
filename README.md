@@ -2,6 +2,8 @@
 ![Pylint](https://raw.githubusercontent.com/eslazarev/ai-wildberries-review-responder/refs/heads/main/.github/badges/pylint.svg)
 ![Coverage](https://raw.githubusercontent.com/eslazarev/ai-wildberries-review-responder/refs/heads/main/.github/badges/coverage.svg)
 ![Maintainability](https://raw.githubusercontent.com/eslazarev/ai-wildberries-review-responder/refs/heads/main/.github/badges/radon.svg)
+![CodeQL](https://github.com/eslazarev/ai-wildberries-review-responder/actions/workflows/codeql.yml/badge.svg)
+![Dependabot](https://img.shields.io/badge/dependabot-enabled-brightgreen.svg)
 ![Black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue)
