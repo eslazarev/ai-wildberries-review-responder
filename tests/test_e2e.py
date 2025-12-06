@@ -5,7 +5,7 @@ import threading
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Iterator, List
+from typing import Iterator, List, Union, cast
 
 import requests
 
@@ -119,7 +119,10 @@ def run_http_server(handler_cls) -> Iterator[str]:
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
-        host, port = server.server_address
+        address = server.server_address
+        host_raw = cast(Union[str, bytes], address[0])
+        host = host_raw.decode("utf-8") if isinstance(host_raw, bytes) else host_raw
+        port = cast(int, address[1])
         yield f"http://{host}:{port}"
     finally:
         server.shutdown()
