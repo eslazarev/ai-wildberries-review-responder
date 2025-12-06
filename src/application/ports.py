@@ -29,4 +29,3 @@ class ReviewPublisher(Protocol):
     """Port for publishing a reply back to the review source."""
 
     def publish_reply(self, review_id: str, reply: str) -> None: ...
-

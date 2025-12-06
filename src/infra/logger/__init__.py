@@ -2,15 +2,11 @@ from __future__ import annotations
 
 import json
 import sys
-from typing import TYPE_CHECKING, Any, Dict
+from typing import Any, Dict
 
 from loguru import logger as loguru_logger
 
-if TYPE_CHECKING:
-    from loguru._logger import Logger  # type: ignore[attr-defined]
-    from loguru._handler import Message  # type: ignore[attr-defined]
-else:
-    Logger = type(loguru_logger)
+LoggerType = Any
 
 
 def _serialize_record(record: Dict[str, Any]) -> Dict[str, Any]:
@@ -25,13 +21,13 @@ def _serialize_record(record: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def _json_sink(message: "Message") -> None:
+def _json_sink(message: Any) -> None:
     payload = _serialize_record(message.record)
     serialized = json.dumps(payload, ensure_ascii=False, default=str)
     sys.stdout.write(serialized + "\n")
 
 
-def init_logger() -> Logger:
+def init_logger() -> LoggerType:
     """
     Initialize and return the shared Loguru logger.
 

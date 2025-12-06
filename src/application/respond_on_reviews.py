@@ -19,7 +19,9 @@ def respond_on_reviews(
 
     for review in reviews:
         review_summary = review.combined_text
-        logger.info(f"Preparing reply for review {review_summary}", )
+        logger.info(
+            f"Preparing reply for review {review_summary}",
+        )
 
         reply = reply_generator.generate(review)
         logger.info("Generated reply {}", reply)
@@ -28,4 +30,3 @@ def respond_on_reviews(
         logger.info("Published reply for review {}", review_summary)
 
     logger.info(f"Published {len(reviews)} pending reviews")
-

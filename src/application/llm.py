@@ -23,4 +23,3 @@ class LLMClient(ABC):
     def generate_reply(self, prompt: str) -> str:
         """Return the text reply produced by the model."""
         raise NotImplementedError
-

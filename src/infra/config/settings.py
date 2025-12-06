@@ -41,7 +41,7 @@ class LLMRuntimeSettings(BaseModel):
     max_tokens: int = 600
     instructions: str = "You are a polite support agent replying to Wildberries reviews."
     timeout: int = 10
-    prompt_template: str
+    prompt_template: str = "Reply to the Wildberries review in a polite and concise tone."
     yandexgpt: YandexLLMSettings = Field(default_factory=YandexLLMSettings)
     openai: OpenAILLMSettings = Field(default_factory=OpenAILLMSettings)
 
