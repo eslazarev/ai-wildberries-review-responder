@@ -1,0 +1,15 @@
+{
+  "name": "wb-responder",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Serverless deployment helpers for Wildberries responder",
+  "scripts": {
+    "package": "serverless package",
+    "deploy": "serverless deploy",
+    "remove": "serverless remove"
+  },
+  "devDependencies": {
+    "@yandex-cloud/serverless-plugin": "^1.7.25",
+    "serverless": "^3.38.0"
+  }
+}
