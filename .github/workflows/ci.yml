@@ -53,7 +53,7 @@ jobs:
           anybadge --value=$coverage% --file=.github/badges/coverage.svg --label=coverage --color=#007ec6 --overwrite
 
       - name: Upload badge artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: badges
           path: .github/badges/
