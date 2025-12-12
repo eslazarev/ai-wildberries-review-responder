@@ -1,11 +1,9 @@
 wildberries:
-  api_token: "YOUR_WILDBERRIES_API_TOKEN"
   base_url: "https://feedbacks-api.wildberries.ru"
   request_timeout: 10
   batch_size: 10
 
 llm:
-  api_key:
   model: "gpt://{FOLDER_ID}/aliceai-llm/latest"
   base_url: "https://rest-assistant.api.cloud.yandex.net/v1"
   temperature: 0.3

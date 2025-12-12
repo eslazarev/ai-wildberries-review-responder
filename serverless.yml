@@ -23,7 +23,9 @@ functions:
     memorySize: 512
     timeout: '30'
     account: wb-responder-function-service-account
-
+    environment:
+      WILDBERRIES__API_TOKEN: ${env:WB_API_TOKEN}
+      LLM__API_KEY: ${env:LLM_API_KEY, 'null'}
     events:
       - cron:
           expression: "*/30 * * * ? *"

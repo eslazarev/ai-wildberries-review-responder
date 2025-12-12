@@ -37,11 +37,10 @@
 
 ## Токен Wildberries
 1. В личном кабинете продавца откройте Wildberries «Профиль → Настройки → Доступ к API → Отзывы и вопросы».
-2. Создайте новый ключ и впишите его в `settings.yaml`:
+2. Создайте новый ключ и передайте его в функцию через переменную окружения `WB_API_TOKEN` (Serverless прокинет её в `WILDBERRIES__API_TOKEN`):
 
 ```yaml
 wildberries:
-  api_token: "YOUR_WILDBERRIES_API_TOKEN"
   base_url: "https://feedbacks-api.wildberries.ru"
   request_timeout: 10
   batch_size: 10
@@ -66,6 +65,13 @@ yc init  # выбираем облако, каталог и авторизуем
    Здесь подтянется `serverless` и `@yandex-cloud/serverless-plugin`.
 2. Сборка и деплой:
    ```bash
+   WB_API_TOKEN='your_wb_token' serverless deploy
+   # (опционально) если LLM требует ключ:
+   # LLM_API_KEY='your_llm_api_key' WB_API_TOKEN='your_wb_token' serverless deploy
+   ```
+   Или в две команды:
+   ```bash
+   export WB_API_TOKEN='your_wb_token'
    serverless deploy
    ```
    Скрипт упакует `src/`, `requirements.txt` и `settings.yaml`, загрузит архив в Yandex Cloud и создаст Cloud Function `wb-responder-function` вместе с cron-триггером `*/30 * * * ? *`, который запускает обработку каждые 30 минут.
