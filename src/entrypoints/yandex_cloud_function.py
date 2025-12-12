@@ -1,8 +1,4 @@
-"""
-Cron-friendly entrypoint for Yandex Cloud Function triggers.
-
-Use `infra.cron_entrypoint:cron_handler` as the function entrypoint.
-"""
+from __future__ import annotations
 
 from typing import Any, Dict, cast
 
@@ -16,9 +12,27 @@ from src.infra.prompt import PromptBuilder
 from src.infra.reply_generator import LLMReplyGenerator
 
 
-def cron_handler(event: Dict[str, Any] | None = None, context: Any = None) -> Dict[str, Any]:
+def _apply_yc_context_settings(settings: Settings, context: Any) -> None:
+    if context is None:
+        return
 
+    folder_id = getattr(context, "function_folder_id", None)
+    if isinstance(folder_id, str) and folder_id:
+        if settings.llm.model and "{FOLDER_ID}" in settings.llm.model:
+            settings.llm.model = settings.llm.model.replace("{FOLDER_ID}", folder_id)
+
+    token = getattr(context, "token", None)
+    if isinstance(token, dict):
+        access_token = token.get("access_token")
+        if isinstance(access_token, str) and access_token.strip():
+            if not (settings.llm.api_key and settings.llm.api_key.strip()):
+                settings.llm.api_key = access_token
+
+
+def handler(event: Dict[str, Any] | None = None, context: Any = None) -> Dict[str, Any]:
     settings = Settings()
+    _apply_yc_context_settings(settings, context)
+
     logger = cast(AppLogger, init_logger())
     wildberries_client = WildberriesClient(settings)
     llm_client = make_llm_client(settings)
@@ -35,7 +49,3 @@ def cron_handler(event: Dict[str, Any] | None = None, context: Any = None) -> Di
     return {
         "status": "ok",
     }
-
-
-if __name__ == "__main__":
-    cron_handler()

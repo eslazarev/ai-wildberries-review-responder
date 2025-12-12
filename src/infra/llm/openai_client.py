@@ -4,7 +4,7 @@ from openai import OpenAI
 
 from src.application.llm import LLMClient
 from src.domain.entities import LLMResponse
-from src.infra.config.settings import OpenAILLMSettings
+from src.infra.config.settings import LLMRuntimeSettings
 
 
 class OpenAIClient(LLMClient):
@@ -12,7 +12,7 @@ class OpenAIClient(LLMClient):
 
     def __init__(
         self,
-        config: OpenAILLMSettings,
+        config: LLMRuntimeSettings,
         *,
         temperature: float,
         max_tokens: int,

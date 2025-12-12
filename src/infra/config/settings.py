@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from enum import Enum
 from pathlib import Path
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict, YamlConfigSettingsSource
@@ -13,37 +12,15 @@ class WildberriesSettings(BaseModel):
     batch_size: int = 10
 
 
-class YandexLLMSettings(BaseModel):
+class LLMRuntimeSettings(BaseModel):
     api_key: str | None = None
-    folder_id: str = ""
     model: str = ""
     base_url: str = "https://rest-assistant.api.cloud.yandex.net/v1"
-
-    def resolved_model_uri(self) -> str:
-        model_name = self.model.strip()
-        return f"gpt://{self.folder_id}/{model_name}"
-
-
-class OpenAILLMSettings(BaseModel):
-    api_key: str | None = None
-    model: str = "gpt-5.1"
-    base_url: str = "https://api.openai.com/v1"
-
-
-class LLMProvider(str, Enum):
-    YANDEX = "yandexgpt"
-    OPENAI = "openai"
-
-
-class LLMRuntimeSettings(BaseModel):
-    provider: LLMProvider = LLMProvider.YANDEX
     temperature: float = 0.3
     max_tokens: int = 600
     instructions: str = "You are a polite support agent replying to Wildberries reviews."
     timeout: int = 10
     prompt_template: str = "Reply to the Wildberries review in a polite and concise tone."
-    yandexgpt: YandexLLMSettings = Field(default_factory=YandexLLMSettings)
-    openai: OpenAILLMSettings = Field(default_factory=OpenAILLMSettings)
 
 
 class Settings(BaseSettings):
@@ -73,8 +50,8 @@ class Settings(BaseSettings):
 
         return (
             init_settings,
-            yaml_settings,
             env_settings,
             dotenv_settings,
             file_secret_settings,
+            yaml_settings,
         )
