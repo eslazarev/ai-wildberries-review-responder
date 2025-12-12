@@ -25,7 +25,8 @@ def _apply_yc_context_settings(settings: Settings, context: Any) -> None:
     if isinstance(token, dict):
         access_token = token.get("access_token")
         if isinstance(access_token, str) and access_token.strip():
-            if not (settings.llm.api_key and settings.llm.api_key.strip()):
+            api_key = (settings.llm.api_key or "").strip()
+            if not api_key or api_key.lower() == "null":
                 settings.llm.api_key = access_token
 
 

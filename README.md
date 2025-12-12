@@ -81,6 +81,29 @@ yc init  # выбираем облако, каталог и авторизуем
    ```
    Команда снесёт функцию, сервисные аккаунты и триггер — полезно, если нужно быстро освободить лимиты.
 
+## Docker (локально или сервер)
+### Скачать готовый образ
+```bash
+docker pull eslazarev/ai-wildberries-review-responder:latest
+```
+
+### Разовый запуск (одна обработка пачки отзывов)
+```bash
+docker run --rm \
+  -e WILDBERRIES__API_TOKEN='your_wb_token' \
+  -e LLM__API_KEY='your_llm_api_key' \
+  eslazarev/ai-wildberries-review-responder:latest
+```
+
+### Запуск по расписанию (cron внутри контейнера)
+```bash
+docker run --rm \
+  -e WILDBERRIES__API_TOKEN='your_wb_token' \
+  -e LLM__API_KEY='your_llm_api_key' \
+  -e SCHEDULE_CRON='*/30 * * * *' \
+  eslazarev/ai-wildberries-review-responder:latest src.entrypoints.docker_cron
+```
+
 ## Конфигурация LLM
 - Делайте правки через `settings.yaml`. Любую настройку можно перекрыть переменными окружения (Pydantic Settings позаботится об этом).
 - Чтобы использовать другой OpenAI-совместимый сервер, задайте `llm.base_url`, `llm.model` и при необходимости `llm.api_key`.
