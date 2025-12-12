@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
+
 from src.application.ports import AppLogger, ReplyGenerator, ReviewFetcher, ReviewPublisher
+from src.domain.entities import Review
 
 
 def respond_on_reviews(

@@ -1,11 +1,11 @@
 wildberries:
-  api_token: "YOUR_WILDBERRIES_API_TOKEN"
   base_url: "https://feedbacks-api.wildberries.ru"
   request_timeout: 10
   batch_size: 10
 
 llm:
-  provider: "yandexgpt"
+  model: "gpt://{FOLDER_ID}/aliceai-llm/latest"
+  base_url: "https://rest-assistant.api.cloud.yandex.net/v1"
   temperature: 0.3
   max_tokens: 600
   instructions: |
@@ -16,12 +16,3 @@ llm:
     Ты не работаешь в Wildberries, не упоминай компанию в ответе.
     Не используй эмодзи.
   timeout: 10
-  yandexgpt:
-    api_key:
-    folder_id: "YOUR_YANDEX_CLOUD_FOLDER_ID"
-    model: "aliceai-llm/latest"
-    base_url: "https://rest-assistant.api.cloud.yandex.net/v1"
-  openai:
-    api_key:
-    model: "gpt-5.1"
-    base_url: "https://api.openai.com/v1"

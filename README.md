@@ -16,11 +16,13 @@
 Проект рассчитан на запуск внутри Yandex Cloud Functions по расписанию, так что выделять и поддерживать собственный сервер не нужно.
 
 ## Кратко как всё устроено
-- каждые 30 минут Cloud Function просыпается по cron-триггеру, забирает пачку необработанных отзывов через `wildberries/api/v1/feedbacks/list`;
+- каждые 30 минут (можно как захотите) Cloud Function просыпается по cron-триггеру, забирает пачку необработанных отзывов через `wildberries/api/v1/feedbacks/list`;
 - `PromptBuilder` собирает промпт с отзывом целиком, LLM выдаёт дружелюбный ответ в нужном языке;
 - готовый текст публикуется через `wildberries/api/v1/feedbacks/answer`.
 
 ## Сколько это стоит?
+- Сам код открыт и бесплатен!
+- Вы плачиваете только за использование Yandex Cloud и YandexGPT (или OpenAI) и среды выполнения.
 - Yandex Cloud Functions тарифицируется по времени выполнения и объёму памяти. 
 - YandexGPT тарифицируется по количеству обработанных токенов (входящих + выходящих).
 - Wildberries Feedbacks API бесплатен в рамках лимитов личного кабинета продавца.
@@ -35,11 +37,10 @@
 
 ## Токен Wildberries
 1. В личном кабинете продавца откройте Wildberries «Профиль → Настройки → Доступ к API → Отзывы и вопросы».
-2. Создайте новый ключ и впишите его в `settings.yaml`:
+2. Создайте новый ключ и передайте его в функцию через переменную окружения `WB_API_TOKEN` (Serverless прокинет её в `WILDBERRIES__API_TOKEN`):
 
 ```yaml
 wildberries:
-  api_token: "YOUR_WILDBERRIES_API_TOKEN"
   base_url: "https://feedbacks-api.wildberries.ru"
   request_timeout: 10
   batch_size: 10
@@ -54,20 +55,7 @@ curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
 yc init  # выбираем облако, каталог и авторизуемся по OAuth
 ```
 
-### Достаём `folder_id`
-```bash
-yc resource-manager folder list
-```
-Скопируйте идентификатор нужной папки и подставьте в `settings.yaml`:
-```yaml
-llm:
-  provider: "yandexgpt"
-  yandexgpt:
-    folder_id: "YOUR_YANDEX_CLOUD_FOLDER_ID"
-    model: "aliceai-llm/latest"
-```
-Если запускаете код локально, добавьте сюда же `api_key`, созданный в консоли YandexGPT. 
-В продакшене внутри Cloud Functions ключ не нужен: клиент автоматически запросит IAM-токен из метаданных и будет использовать его для вызова `rest-assistant.api.cloud.yandex.net`.
+Внутри Cloud Functions ключ не нужен: функция возьмёт IAM-токен из `context.token["access_token"]` и подставит `folder_id` в модель (заменит `{FOLDER_ID}`).
 
 ## npm-скрипты: установка, деплой и удаление
 1. Установите JS-зависимости разом:
@@ -77,6 +65,13 @@ llm:
    Здесь подтянется `serverless` и `@yandex-cloud/serverless-plugin`.
 2. Сборка и деплой:
    ```bash
+   WB_API_TOKEN='your_wb_token' serverless deploy
+   # (опционально) если LLM требует ключ:
+   # LLM_API_KEY='your_llm_api_key' WB_API_TOKEN='your_wb_token' serverless deploy
+   ```
+   Или в две команды:
+   ```bash
+   export WB_API_TOKEN='your_wb_token'
    serverless deploy
    ```
    Скрипт упакует `src/`, `requirements.txt` и `settings.yaml`, загрузит архив в Yandex Cloud и создаст Cloud Function `wb-responder-function` вместе с cron-триггером `*/30 * * * ? *`, который запускает обработку каждые 30 минут.
@@ -88,7 +83,7 @@ llm:
 
 ## Конфигурация LLM
 - Делайте правки через `settings.yaml`. Любую настройку можно перекрыть переменными окружения (Pydantic Settings позаботится об этом).
-- Если захотите проверять другие модели, поменяйте `llm.provider` на `openai` и заполните `llm.openai.api_key` + `llm.openai.model`.
+- Чтобы использовать другой OpenAI-совместимый сервер, задайте `llm.base_url`, `llm.model` и при необходимости `llm.api_key`.
 - Температуру, верхний лимит токенов, инструкции и шаблон промпта (`llm.prompt_template`) правим там же.
 
 ## Почему Cloud Functions (и почему без серверов)

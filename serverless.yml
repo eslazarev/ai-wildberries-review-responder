@@ -19,23 +19,25 @@ package:
 functions:
   WbResponderFunction:
     name: wb-responder-function
-    handler: src.entrypoints.cron_entrypoint.cron_handler
+    handler: src.entrypoints.yandex_cloud_function.handler
     memorySize: 512
     timeout: '30'
-    account: wb-responder-service-account
-
+    account: wb-responder-function-service-account
+    environment:
+      WILDBERRIES__API_TOKEN: ${env:WB_API_TOKEN}
+      LLM__API_KEY: ${env:LLM_API_KEY, 'null'}
     events:
       - cron:
           expression: "*/30 * * * ? *"
-          account: trigger-sa
+          account: wb-responder-trigger-service-account
 
 resources:
-  wb-responder-service-account:
+  wb-responder-function-service-account:
     type: yc::ServiceAccount
     roles:
       - ai.languageModels.user
 
-  trigger-sa:
+  wb-responder-trigger-service-account:
     type: yc::ServiceAccount
     roles:
       - serverless.functions.invoker
