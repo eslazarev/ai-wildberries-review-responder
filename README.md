@@ -16,7 +16,7 @@
 Проект рассчитан на запуск внутри Yandex Cloud Functions по расписанию, так что выделять и поддерживать собственный сервер не нужно.
 
 ## Кратко как всё устроено
-- каждые 30 минут (можно как захотите) Cloud Function просыпается по cron-триггеру, забирает пачку необработанных отзывов через `wildberries/api/v1/feedbacks/list`;
+- каждые 30 минут (по умолчанию, настраивается) Cloud Function просыпается по cron-триггеру, забирает пачку необработанных отзывов через `wildberries/api/v1/feedbacks/list`;
 - `PromptBuilder` собирает промпт с отзывом целиком, LLM выдаёт дружелюбный ответ в нужном языке;
 - готовый текст публикуется через `wildberries/api/v1/feedbacks/answer`.
 
@@ -44,9 +44,10 @@ wildberries:
   base_url: "https://feedbacks-api.wildberries.ru"
   request_timeout: 10
   batch_size: 10
+  check_every_minutes: 30
 ```
 
-`batch_size` задаёт сколько отзывов обрабатываем за вызов. При необходимости WB можно ограничивать чаще/реже за счёт cron-выражения в `serverless.yml`.
+`batch_size` задаёт сколько отзывов обрабатываем за вызов, `check_every_minutes` — период запуска (в минутах).
 
 ## Настройка Yandex Cloud и YandexGPT
 ### Установка и авторизация `yc`
@@ -68,6 +69,8 @@ yc init  # выбираем облако, каталог и авторизуем
    WB_API_TOKEN='your_wb_token' serverless deploy
    # (опционально) если LLM требует ключ:
    # LLM_API_KEY='your_llm_api_key' WB_API_TOKEN='your_wb_token' serverless deploy
+   # (опционально) изменить период запуска (в минутах):
+   # WB_CHECK_EVERY_MINUTES='15' WB_API_TOKEN='your_wb_token' serverless deploy
    ```
    Или в две команды:
    ```bash
@@ -100,7 +103,14 @@ docker run --rm \
 docker run --rm \
   -e WILDBERRIES__API_TOKEN='your_wb_token' \
   -e LLM__API_KEY='your_llm_api_key' \
-  -e SCHEDULE_CRON='*/30 * * * *' \
+  eslazarev/ai-wildberries-review-responder:latest src.entrypoints.docker_cron
+```
+По умолчанию контейнер берёт период запуска из `wildberries.check_every_minutes` (30 минут). При необходимости можно переопределить:
+```bash
+docker run --rm \
+  -e WILDBERRIES__API_TOKEN='your_wb_token' \
+  -e WILDBERRIES__CHECK_EVERY_MINUTES='15' \
+  -e LLM__API_KEY='your_llm_api_key' \
   eslazarev/ai-wildberries-review-responder:latest src.entrypoints.docker_cron
 ```
 
