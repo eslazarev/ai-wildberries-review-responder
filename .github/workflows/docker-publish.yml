@@ -32,8 +32,6 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/ai-wildberries-review-responder
           tags: |
-            type=sha
-            type=ref,event=branch
             type=ref,event=tag
             type=raw,value=latest,enable={{is_default_branch}}
 
