@@ -10,6 +10,7 @@ class WildberriesSettings(BaseModel):
     base_url: str = "https://feedbacks-api.wildberries.ru"
     request_timeout: int = 10
     batch_size: int = 10
+    check_every_minutes: int = 30
 
 
 class LLMRuntimeSettings(BaseModel):

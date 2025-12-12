@@ -2,6 +2,7 @@ wildberries:
   base_url: "https://feedbacks-api.wildberries.ru"
   request_timeout: 10
   batch_size: 10
+  check_every_minutes: 30
 
 llm:
   model: "gpt://{FOLDER_ID}/aliceai-llm/latest"

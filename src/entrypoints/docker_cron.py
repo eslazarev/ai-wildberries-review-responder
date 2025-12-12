@@ -8,6 +8,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler  # type: ignore[im
 from apscheduler.triggers.cron import CronTrigger  # type: ignore[import-untyped]
 
 from src.entrypoints.docker_once import run_once
+from src.infra.config.settings import Settings
 from src.infra.logger import init_logger
 
 
@@ -21,7 +22,12 @@ def _env_bool(name: str, default: bool = False) -> bool:
 def main() -> None:
     logger: Any = init_logger()
 
-    cron = os.getenv("SCHEDULE_CRON", "*/30 * * * *")
+    schedule_cron = os.getenv("SCHEDULE_CRON")
+    if schedule_cron and schedule_cron.strip():
+        cron = schedule_cron.strip()
+    else:
+        settings = Settings()
+        cron = f"*/{settings.wildberries.check_every_minutes} * * * *"
     timezone_name = os.getenv("SCHEDULE_TZ", "UTC")
     run_on_startup = _env_bool("RUN_ON_STARTUP", True)
 

@@ -1,6 +1,10 @@
 service: ai-wildberries-review-responder
 frameworkVersion: "3"
 
+custom:
+  checkEveryMinutesFromFile: ${file(./settings.yaml):wildberries.check_every_minutes, 30}
+  checkEveryMinutes: ${env:WB_CHECK_EVERY_MINUTES, self:custom.checkEveryMinutesFromFile}
+
 provider:
   name: yandex-cloud
   runtime: python312
@@ -28,7 +32,7 @@ functions:
       LLM__API_KEY: ${env:LLM_API_KEY, 'null'}
     events:
       - cron:
-          expression: "*/30 * * * ? *"
+          expression: "*/${self:custom.checkEveryMinutes} * * * ? *"
           account: wb-responder-trigger-service-account
 
 resources:
