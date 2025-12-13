@@ -15,4 +15,4 @@ COPY src ./src
 COPY settings.yaml ./settings.yaml
 
 ENTRYPOINT ["python", "-m"]
-CMD ["src.entrypoints.docker_once"]
+CMD ["src.entrypoints.docker_cron"]
