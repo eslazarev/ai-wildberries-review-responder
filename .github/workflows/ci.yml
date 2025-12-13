@@ -26,6 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
+      - name: Run Black formatting check
+        run: black . -l 120 --check
+
       - name: Run mypy
         run: mypy --install-types --non-interactive --explicit-package-bases .
 
