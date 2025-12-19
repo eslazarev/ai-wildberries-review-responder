@@ -94,4 +94,4 @@ class WildberriesReview(BaseModel):
         return json.dumps(payload, ensure_ascii=False, indent=2, default=str)
 
     def to_review(self) -> Review:
-        return Review(id=self.id, text=self.text, summary=self.summary)
+        return Review(id=self.id, text=self.to_source_payload(), summary=self.summary)
