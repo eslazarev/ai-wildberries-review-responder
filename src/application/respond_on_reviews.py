@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import json
-
 from src.application.ports import AppLogger, ReplyGenerator, ReviewFetcher, ReviewPublisher
-from src.domain.entities import Review
 
 
 def respond_on_reviews(
@@ -21,7 +18,7 @@ def respond_on_reviews(
     logger.info("Fetched {} pending reviews", len(reviews))
 
     for review in reviews:
-        review_summary = review.combined_text
+        review_summary = review.summary
         logger.info(
             f"Preparing reply for review {review_summary}",
         )

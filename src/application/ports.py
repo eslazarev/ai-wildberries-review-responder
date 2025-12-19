@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol, Sequence
 
-from src.domain.entities import Review
+from src.domain.wildberries.entities import WildberriesReview
 
 
 class AppLogger(Protocol):
@@ -16,13 +16,13 @@ class AppLogger(Protocol):
 class ReviewFetcher(Protocol):
     """Port for loading pending reviews."""
 
-    def fetch_reviews(self) -> Sequence[Review]: ...
+    def fetch_reviews(self) -> Sequence[WildberriesReview]: ...
 
 
 class ReplyGenerator(Protocol):
     """Port for transforming a review into an LLM-ready reply."""
 
-    def generate(self, review: Review) -> str: ...
+    def generate(self, review: WildberriesReview) -> str: ...
 
 
 class ReviewPublisher(Protocol):

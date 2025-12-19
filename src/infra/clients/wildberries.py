@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 import requests
 
-from src.domain.entities import Review
+from src.domain.wildberries.entities import WildberriesReview
 from src.infra.config.settings import Settings
 
 
@@ -23,7 +23,7 @@ class WildberriesClient:
             }
         )
 
-    def fetch_reviews(self) -> List[Review]:
+    def fetch_reviews(self) -> List[WildberriesReview]:
         url = f"{self._config.base_url}/api/v1/feedbacks"
         params = {"isAnswered": False, "take": self.batch_size, "skip": 0}
 
@@ -33,9 +33,9 @@ class WildberriesClient:
         payload: Dict[str, Any] = response.json()
         items = payload.get("data", {}).get("feedbacks", [])
 
-        reviews: List[Review] = []
+        reviews: List[WildberriesReview] = []
         for raw in items:
-            reviews.append(Review(**raw))
+            reviews.append(WildberriesReview(**raw))
         return reviews
 
     def publish_reply(self, review_id: str, message: str) -> None:

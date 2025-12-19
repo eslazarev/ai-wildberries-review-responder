@@ -1,0 +1,1 @@
+"""Wildberries domain models."""
