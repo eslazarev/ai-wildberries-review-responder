@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 import requests
 
 from src.domain.entities import Review
-from src.domain.wildberries.entities import WildberriesReview
+from src.infra.clients.wildberries_dto import WildberriesReview
 from src.infra.config.settings import Settings
 
 
