@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from src.application.llm import LLMClient
-from src.domain.wildberries.entities import WildberriesReview
+from src.domain.entities import Review
 from src.infra.prompt import PromptBuilder
 
 
@@ -12,6 +12,6 @@ class LLMReplyGenerator:
         self.prompt_builder = prompt_builder
         self.llm_client = llm_client
 
-    def generate(self, review: WildberriesReview) -> str:
+    def generate(self, review: Review) -> str:
         prompt = self.prompt_builder.build(review)
         return self.llm_client.generate_reply(prompt)

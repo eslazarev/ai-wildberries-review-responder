@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
+
+from src.domain.entities import Review
 
 
 class ProductDetails(BaseModel):
@@ -38,6 +41,23 @@ class WildberriesReview(BaseModel):
 
     model_config = ConfigDict(frozen=True, populate_by_name=True)
 
+    _SOURCE_PAYLOAD_INCLUDE = {
+        "id",
+        "text",
+        "pros",
+        "cons",
+        "rating",
+        "product_details",
+        "author",
+        "matching_size",
+        "bables",
+        "color",
+        "subject_name",
+        "has_photos",
+        "has_video",
+    }
+
+    id: str
     product_id: str | None = Field(default=None, alias="productId")
     author: str | None = Field(default=None, alias="userName")
     rating: int | None = Field(default=None, alias="productValuation")
@@ -50,9 +70,28 @@ class WildberriesReview(BaseModel):
     photo_links: List[PhotoLink] | None = Field(default=None, alias="photoLinks")
     video: VideoInfo | None = Field(default=None, alias="video")
     matching_size: str | None = Field(default=None, alias="matchingSize")
+    bables: List[str] | None = None
     color: str | None = Field(default=None, alias="color")
     state: str | None = Field(default=None, alias="state")
+    subject_name: str | None = Field(default=None, alias="subjectName")
 
     @property
     def summary(self) -> str:
         return "\n".join(filter(None, [self.text, self.pros, self.cons]))
+
+    @computed_field
+    def has_photos(self) -> bool:
+        return bool(self.photo_links)
+
+    @computed_field
+    def has_video(self) -> bool:
+        if not self.video:
+            return False
+        return bool(self.video.link or self.video.preview_image or self.video.duration_sec is not None)
+
+    def to_source_payload(self) -> str:
+        payload = self.model_dump(by_alias=True, include=self._SOURCE_PAYLOAD_INCLUDE)
+        return json.dumps(payload, ensure_ascii=False, indent=2, default=str)
+
+    def to_review(self) -> Review:
+        return Review(id=self.id, text=self.text, summary=self.summary)
