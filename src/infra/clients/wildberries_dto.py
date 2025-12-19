@@ -46,9 +46,9 @@ class WildberriesReview(BaseModel):
         "text",
         "pros",
         "cons",
-        "rating",
+        "product_valuation",
         "product_details",
-        "author",
+        "user_name",
         "matching_size",
         "bables",
         "color",
@@ -59,12 +59,12 @@ class WildberriesReview(BaseModel):
 
     id: str
     product_id: str | None = Field(default=None, alias="productId")
-    author: str | None = Field(default=None, alias="userName")
-    rating: int | None = Field(default=None, alias="productValuation")
+    user_name: str | None = Field(default=None, alias="userName")
+    product_valuation: int | None = Field(default=None, alias="productValuation")
     text: str | None = Field(default=None, alias="text")
     pros: str | None = Field(default=None, alias="pros")
     cons: str | None = Field(default=None, alias="cons")
-    created_at: datetime | None = Field(default=None, alias="createdDate")
+    created_date: datetime | None = Field(default=None, alias="createdDate")
     language: str | None = Field(default=None, alias="language")
     product_details: ProductDetails | None = Field(default=None, alias="productDetails")
     photo_links: List[PhotoLink] | None = Field(default=None, alias="photoLinks")
