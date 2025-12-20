@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 import requests
 
 from src.domain.entities import Review
+from src.infra.clients.wildberries_dto import WildberriesReview
 from src.infra.config.settings import Settings
 
 
@@ -35,7 +36,7 @@ class WildberriesClient:
 
         reviews: List[Review] = []
         for raw in items:
-            reviews.append(Review(**raw))
+            reviews.append(WildberriesReview(**raw).to_review())
         return reviews
 
     def publish_reply(self, review_id: str, message: str) -> None:

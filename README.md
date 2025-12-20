@@ -9,6 +9,7 @@
 ![Black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue)
+[![Docker Pulls](https://img.shields.io/docker/pulls/eslazarev/ai-wildberries-review-responder)](https://hub.docker.com/r/eslazarev/ai-wildberries-review-responder)
 
 # Сервис-автоответчик на отзывы Wildberries с YandexGPT или OpenAI
 
