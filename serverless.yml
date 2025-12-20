@@ -3,7 +3,7 @@ frameworkVersion: "3"
 
 custom:
   checkEveryMinutesFromFile: ${file(./settings.yaml):wildberries.check_every_minutes, 30}
-  checkEveryMinutes: ${env:WB_CHECK_EVERY_MINUTES, self:custom.checkEveryMinutesFromFile}
+  checkEveryMinutes: ${env:WILDBERRIES__CHECK_EVERY_MINUTES, self:custom.checkEveryMinutesFromFile}
 
 provider:
   name: yandex-cloud
@@ -28,8 +28,8 @@ functions:
     timeout: '30'
     account: wb-responder-function-service-account
     environment:
-      WILDBERRIES__API_TOKEN: ${env:WB_API_TOKEN}
-      LLM__API_KEY: ${env:LLM_API_KEY, 'null'}
+      WILDBERRIES__API_TOKEN: ${env:WILDBERRIES__API_TOKEN}
+      LLM__API_KEY: ${env:LLM__API_KEY, 'null'}
     events:
       - cron:
           expression: "*/${self:custom.checkEveryMinutes} * * * ? *"
