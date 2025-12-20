@@ -87,7 +87,8 @@
 ### Пример фактических расходов
 ![Пример расходов в Yandex Cloud](.github/images/yandex_cloud_cost.png)
 
-Производственные замеры показали стоимость около 0,25 рубля за один отзыв. На скриншоте за два дня было отвечено примерно на 100 отзывов.
+Производственные замеры показали стоимость около **0,25 рубля за один отзыв**. 
+На скриншоте за два дня было отвечено примерно на 100 отзывов.
 
 ## Быстрый старт
 Если всё уже настроено (YC, доступы, токены), достаточно:
@@ -112,6 +113,7 @@ WILDBERRIES__CHECK_EVERY_MINUTES='15' WILDBERRIES__API_TOKEN='your_wb_token' ser
 ### Получение API-токена Wildberries
 1. В кабинете продавца откройте «Профиль → Настройки → Доступ к API → Отзывы и вопросы».
 2. Создайте новый ключ и передайте его через переменную окружения `WILDBERRIES__API_TOKEN`.
+3. Документация по токенам: https://dev.wildberries.ru/openapi/api-information#tag/Avtorizaciya/Kak-sozdat-personalnyj-bazovyj-ili-testovyj-token
 
 ### Доступ к YandexGPT или OpenAI
 - Для YandexGPT в Yandex Cloud Functions нужен сервисный аккаунт с ролью `ai.languageModels.user` (описано в `serverless.yml`).
@@ -123,20 +125,20 @@ WILDBERRIES__CHECK_EVERY_MINUTES='15' WILDBERRIES__API_TOKEN='your_wb_token' ser
 ### Файл settings.yaml
 `settings.yaml` — основной источник настроек, если их не перекрыли переменными окружения. Пример структуры:
 ```yaml
-wildberries:
-  base_url: "https://feedbacks-api.wildberries.ru"
-  request_timeout: 10
-  batch_size: 10
-  check_every_minutes: 30
+wildberries: # Блок настроек для Wildberries API.
+  base_url: "https://feedbacks-api.wildberries.ru" # Базовый URL API отзывов.
+  request_timeout: 10 # Таймаут HTTP-запросов, секунды.
+  batch_size: 10 # Сколько отзывов обрабатывать за один запуск.
+  check_every_minutes: 30 # Период запуска в минутах для cron-режимов.
 
-llm:
-  model: "gpt://{FOLDER_ID}/aliceai-llm/latest"
-  base_url: "https://rest-assistant.api.cloud.yandex.net/v1"
-  temperature: 0.3
-  max_tokens: 600
-  instructions: "..."
-  prompt_template: "..."
-  timeout: 10
+llm: # Блок настроек LLM-провайдера.
+  model: "gpt://{FOLDER_ID}/aliceai-llm/latest" # Идентификатор модели; {FOLDER_ID} подставится в YC.
+  base_url: "https://rest-assistant.api.cloud.yandex.net/v1" # Базовый URL LLM API.
+  temperature: 0.3 # Степень креативности ответа (меньше = стабильнее).
+  max_tokens: 600 # Максимум токенов в ответе модели.
+  instructions: "..." # Системные инструкции модели.
+  prompt_template: "..." # Шаблон промпта для текста отзыва.
+  timeout: 10 # Таймаут запросов к LLM, секунды.
 ```
 `{FOLDER_ID}` в модели автоматически заменяется в Yandex Cloud Functions.
 
@@ -198,6 +200,7 @@ python -m src.entrypoints.docker_cron
 ## Запуск в Yandex Cloud Functions (Serverless)
 
 ### Установка и настройка Yandex CLI
+Документация по установке: https://cloud.yandex.ru/docs/cli/quickstart
 ```bash
 curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
 yc init
@@ -230,11 +233,12 @@ docker pull eslazarev/ai-wildberries-review-responder:latest
 ```
 
 ### Разовый запуск контейнера
+По умолчанию образ запускает режим с расписанием. Для разового прогона укажите `src.entrypoints.docker_once`.
 ```bash
 docker run --rm \
   -e WILDBERRIES__API_TOKEN='your_wb_token' \
   -e LLM__API_KEY='your_llm_api_key' \
-  eslazarev/ai-wildberries-review-responder:latest
+  eslazarev/ai-wildberries-review-responder:latest src.entrypoints.docker_once
 ```
 
 ### Запуск по расписанию внутри контейнера
@@ -243,7 +247,7 @@ docker run --rm \
   -e WILDBERRIES__API_TOKEN='your_wb_token' \
   -e WILDBERRIES__CHECK_EVERY_MINUTES='15' \
   -e LLM__API_KEY='your_llm_api_key' \
-  eslazarev/ai-wildberries-review-responder:latest src.entrypoints.docker_cron
+  eslazarev/ai-wildberries-review-responder:latest
 ```
 
 ## Архитектура и внутреннее устройство
