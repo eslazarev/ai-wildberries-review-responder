@@ -2,7 +2,7 @@
 ![Mypy](https://img.shields.io/badge/type%20checked-mypy-039dfc)
 ![Pylint](https://raw.githubusercontent.com/eslazarev/ai-wildberries-review-responder/refs/heads/main/.github/badges/pylint.svg)
 ![Coverage](https://raw.githubusercontent.com/eslazarev/ai-wildberries-review-responder/refs/heads/main/.github/badges/coverage.svg)
-![Maintainability](https://img.shields.io/badge/maintainability-radon-039dfc)
+![Maintainability](https://raw.githubusercontent.com/eslazarev/ai-wildberries-review-responder/refs/heads/main/.github/badges/radon.svg)
 ![CodeQL](https://github.com/eslazarev/ai-wildberries-review-responder/actions/workflows/codeql.yml/badge.svg)
 [![Security: bandit](https://img.shields.io/badge/security-bandit-green.svg)](https://github.com/PyCQA/bandit)
 ![Dependabot](https://img.shields.io/badge/dependabot-enabled-brightgreen.svg)
@@ -26,6 +26,7 @@
   - [Необходимые инструменты](#необходимые-инструменты)
   - [Получение API-токена Wildberries](#получение-api-токена-wildberries)
   - [Доступ к YandexGPT или OpenAI](#доступ-к-yandexgpt-или-openai)
+  - [Локальная модель через Ollama](#локальная-модель-через-ollama)
 - [Конфигурация приложения](#конфигурация-приложения)
   - [Файл settings.yaml](#файл-settingsyaml)
   - [Переменные окружения](#переменные-окружения)
@@ -120,6 +121,25 @@ WILDBERRIES__CHECK_EVERY_MINUTES='15' WILDBERRIES__API_TOKEN='your_wb_token' ser
 - Для YandexGPT в Yandex Cloud Functions нужен сервисный аккаунт с ролью `ai.languageModels.user` (описано в `serverless.yml`).
 - Внутри Cloud Functions можно не задавать `LLM__API_KEY`: функция подставит IAM-токен из `context.token`, если ключ пустой или равен `null`.
 - Для OpenAI или другого OpenAI-совместимого API укажите `LLM__API_KEY`, `LLM__MODEL` и `LLM__BASE_URL`.
+
+### Локальная модель через Ollama
+Можно использовать бесплатные локальные модели через [Ollama](https://ollama.com): сервис поднимает OpenAI-совместимый API на `http://localhost:11434/v1`.
+
+Пример настроек в `settings.yaml`:
+```yaml
+llm:
+  base_url: "http://localhost:11434/v1"
+  model: "gemma3:4b"
+  api_key: "ollama"
+```
+
+Пример через переменные окружения:
+```bash
+export LLM__BASE_URL='http://localhost:11434/v1'
+export LLM__MODEL='gemma3:4b'
+export LLM__API_KEY='ollama'
+```
+Если ключ не требуется, можно указать любое непустое значение.
 
 ## Конфигурация приложения
 
