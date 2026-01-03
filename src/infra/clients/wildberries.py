@@ -24,6 +24,7 @@ class WildberriesClient:
     def _build_client(self) -> communications.ApiClient:
         config = communications.Configuration(host=self._config.base_url.rstrip("/"))
         config.api_key["HeaderApiKey"] = self._config.api_token
+        config.ignore_operation_servers = True
         return communications.ApiClient(configuration=config)
 
     def fetch_reviews(self) -> List[Review]:
