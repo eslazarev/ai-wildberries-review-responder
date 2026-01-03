@@ -34,10 +34,8 @@ class WildberriesClient:
             skip=0,
             _request_timeout=self.timeout,
         )
-        data = cast(Any, response.data)
-        items = list(cast(List[Any], data.feedbacks))
         reviews: List[Review] = []
-        for item in items:
+        for item in response.data.feedbacks:  # type: ignore[union-attr]
             payload = item.model_dump(by_alias=True, exclude_none=True)
             reviews.append(WildberriesReview(**payload).to_review())
         return reviews
