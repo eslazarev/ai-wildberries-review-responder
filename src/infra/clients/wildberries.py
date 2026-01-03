@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
-
+from typing import Any, List, cast
 from wildberries_sdk import communications
+from wildberries_sdk.communications import ApiV1FeedbacksGet200Response
 from wildberries_sdk.communications.models import ApiV1FeedbacksAnswerPostRequest
 
 from src.domain.entities import Review
@@ -28,25 +28,17 @@ class WildberriesClient:
         return communications.ApiClient(configuration=config)
 
     def fetch_reviews(self) -> List[Review]:
-        response = self._api.api_v1_feedbacks_get(
+        response: ApiV1FeedbacksGet200Response = self._api.api_v1_feedbacks_get(
             is_answered=False,
             take=self.batch_size,
             skip=0,
             _request_timeout=self.timeout,
         )
-        items = []
-        if response and response.data and response.data.feedbacks:
-            items = response.data.feedbacks
-
+        data = cast(Any, response.data)
+        items = list(cast(List[Any], data.feedbacks))
         reviews: List[Review] = []
-        for raw in items:
-            payload: Dict[str, Any]
-            if hasattr(raw, "model_dump"):
-                payload = raw.model_dump(by_alias=True, exclude_none=True)
-            else:
-                payload = raw
-            if not payload.get("id"):
-                continue
+        for item in items:
+            payload = item.model_dump(by_alias=True, exclude_none=True)
             reviews.append(WildberriesReview(**payload).to_review())
         return reviews
 
