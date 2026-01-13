@@ -1,5 +1,5 @@
 # Сервис ответов на отзывы покупателей на Wildberries с помощью AI
-![wildberries-ai-review-service.gif](.github/images/wildberries-ai-review-service.gif)
+<img src="https://raw.githubusercontent.com/eslazarev/wildberries-ai-review-service/main/.github/images/wildberries-ai-review-service.gif">
 
 ![CI](https://github.com/eslazarev/ai-wildberries-review-responder/actions/workflows/ci.yml/badge.svg)
 ![Mypy](https://img.shields.io/badge/type%20checked-mypy-039dfc)
