@@ -1,3 +1,6 @@
+# Сервис ответов на отзывы покупателей на Wildberries с помощью AI
+<img src="https://raw.githubusercontent.com/eslazarev/wildberries-ai-review-service/main/.github/images/wildberries-ai-review-service.gif">
+
 ![CI](https://github.com/eslazarev/ai-wildberries-review-responder/actions/workflows/ci.yml/badge.svg)
 ![Mypy](https://img.shields.io/badge/type%20checked-mypy-039dfc)
 ![Pylint](https://raw.githubusercontent.com/eslazarev/ai-wildberries-review-responder/refs/heads/main/.github/badges/pylint.svg)
@@ -11,10 +14,8 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 [![Docker Pulls](https://img.shields.io/docker/pulls/eslazarev/ai-wildberries-review-responder)](https://hub.docker.com/r/eslazarev/ai-wildberries-review-responder)
 
-# Сервис-автоответчик на отзывы Wildberries с YandexGPT или OpenAI
-
 Этот сервис автоматически подхватывает новые отзывы из кабинета продавца Wildberries, генерирует ответ через LLM и отправляет его обратно. Он рассчитан на запуск в Yandex Cloud Functions, но может работать локально или в Docker.
-![ai-responder-arch.png](.github/images/ai-responder-arch.png)
+
 
 ## Содержание
 - [Ключевые возможности](#ключевые-возможности)
