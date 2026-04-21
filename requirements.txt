@@ -1,9 +1,10 @@
 pydantic>=2.6
 pydantic-settings>=2.2
 PyYAML>=6.0
-requests>=2.32.5
+requests>=2.33.0
 wildberries-sdk>=0.1.20
 openai>=1.40
-pytest>=8.0
+pytest>=9.0.3
 pytest-archon>=0.0.7
 loguru>=0.7
+Pygments>=2.20.0
