@@ -1,0 +1,51 @@
+# ai-wildberries-review-responder
+
+> Сервис автоматических ответов на отзывы покупателей на Wildberries с помощью LLM. Запускается в Yandex Cloud Functions, Docker или локально. Поддерживает YandexGPT, OpenAI и любые OpenAI-совместимые API (включая локальные модели через Ollama).
+
+Архитектура построена по принципу чистой/гексагональной: домен не зависит от инфраструктуры, оркестрация работает через порты. Поток обработки: получить неотвеченные отзывы из Wildberries Feedbacks API → собрать промпт → вызвать LLM → опубликовать ответ.
+
+## Документация
+
+- [README](README.md): полное описание сервиса на русском — установка, конфигурация, деплой, архитектура, FAQ
+- [LICENSE](LICENSE): MIT
+
+## Конфигурация
+
+- [settings.yaml](settings.yaml): дефолты для Wildberries API и LLM (модель, base_url, температура, инструкции, шаблон промпта)
+- [serverless.yml](serverless.yml): описание деплоя в Yandex Cloud Functions с cron-триггером
+- [Dockerfile](Dockerfile): образ для разового запуска и cron-режима
+- [Makefile](Makefile): цели для линтинга, тестов и CI
+- [requirements.txt](requirements.txt): runtime-зависимости
+- [requirements-dev.txt](requirements-dev.txt): dev-зависимости (линтеры, тесты)
+
+## Точки входа
+
+- [src/entrypoints/yandex_cloud_function.py](src/entrypoints/yandex_cloud_function.py): хэндлер для Yandex Cloud Functions, использует IAM-токен из `context.token`, если `LLM__API_KEY` пуст
+- [src/entrypoints/docker_once.py](src/entrypoints/docker_once.py): разовый прогон одной итерации обработки отзывов
+- [src/entrypoints/docker_cron.py](src/entrypoints/docker_cron.py): cron-режим внутри контейнера через APScheduler
+
+## Оркестрация и домен
+
+- [src/application/respond_on_reviews.py](src/application/respond_on_reviews.py): главный use-case — загрузить отзывы, сгенерировать ответы, опубликовать
+- [src/application/ports.py](src/application/ports.py): абстрактные порты (Wildberries клиент, генератор ответа)
+- [src/application/llm.py](src/application/llm.py): порт LLM
+- [src/domain/entities.py](src/domain/entities.py): доменные модели (Review, Answer и т.п.)
+
+## Инфраструктура
+
+- [src/infra/clients/wildberries.py](src/infra/clients/wildberries.py): клиент Wildberries Feedbacks API
+- [src/infra/clients/wildberries_dto.py](src/infra/clients/wildberries_dto.py): DTO для запросов/ответов WB
+- [src/infra/llm/openai_client.py](src/infra/llm/openai_client.py): OpenAI-совместимый клиент LLM
+- [src/infra/llm/base.py](src/infra/llm/base.py): базовый интерфейс LLM-клиента
+- [src/infra/reply_generator.py](src/infra/reply_generator.py): сборка ответа на отзыв через LLM
+- [src/infra/prompt.py](src/infra/prompt.py): построитель промптов из `instructions` и `prompt_template`
+- [src/infra/config/settings.py](src/infra/config/settings.py): `pydantic-settings` загрузка из YAML и env (приоритет: env → .env → file secrets → settings.yaml)
+
+## Тесты
+
+- [tests](tests): pytest-сьют, включая `test_architecture.py` (через `pytest-archon`) для проверки границ слоёв и `test_e2e.py` с фейковыми HTTP-серверами
+
+## Optional
+
+- [.github/workflows](.github/workflows): CI, CodeQL, сборка и публикация Docker-образа
+- [mypy.ini](mypy.ini), [pytest.ini](pytest.ini): конфигурации type-check и pytest
