@@ -1,6 +1,6 @@
 pydantic>=2.13.3
 pydantic-settings>=2.2
-PyYAML>=6.0
+PyYAML>=6.0.3
 requests>=2.33.0
 wildberries-sdk>=0.1.20
 openai>=1.40
