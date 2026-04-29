@@ -13,6 +13,7 @@
 ![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 [![Docker Pulls](https://img.shields.io/docker/pulls/eslazarev/ai-wildberries-review-responder)](https://hub.docker.com/r/eslazarev/ai-wildberries-review-responder)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/ai-wildberries-review-responder)](https://artifacthub.io/packages/search?repo=ai-wildberries-review-responder)
 
 Этот сервис автоматически подхватывает новые отзывы из кабинета продавца Wildberries, генерирует ответ через LLM и отправляет его обратно. Он рассчитан на запуск в Yandex Cloud Functions, но может работать локально или в Docker.
 
@@ -50,6 +51,9 @@
   - [Загрузка образа](#загрузка-образа)
   - [Разовый запуск контейнера](#разовый-запуск-контейнера)
   - [Запуск по расписанию внутри контейнера](#запуск-по-расписанию-внутри-контейнера)
+- [Запуск в Kubernetes (Helm chart)](#запуск-в-kubernetes-helm-chart)
+  - [Установка через Artifact Hub](#установка-через-artifact-hub)
+  - [Параметры values.yaml](#параметры-valuesyaml)
 - [Архитектура и внутреннее устройство](#архитектура-и-внутреннее-устройство)
   - [Поток обработки отзывов](#поток-обработки-отзывов)
   - [Оркестрация и бизнес-логика](#оркестрация-и-бизнес-логика)
@@ -271,6 +275,37 @@ docker run --rm \
   -e LLM__API_KEY='your_llm_api_key' \
   eslazarev/ai-wildberries-review-responder:latest
 ```
+
+## Запуск в Kubernetes (Helm chart)
+Для развёртывания в Kubernetes есть официальный Helm chart. Он создаёт нативный `CronJob`, который по расписанию выполняет одну итерацию обработки (`src.entrypoints.docker_once`), плюс `ConfigMap` с `settings.yaml` и `Secret` с токенами. Это идиоматичнее, чем держать в контейнере собственный APScheduler.
+
+Чарт опубликован в Artifact Hub: [artifacthub.io/packages/helm/ai-wildberries-review-responder/ai-wildberries-review-responder](https://artifacthub.io/packages/helm/ai-wildberries-review-responder/ai-wildberries-review-responder), а сам репозиторий чартов раздаётся через GitHub Pages: `https://eslazarev.github.io/ai-wildberries-review-responder`.
+
+### Установка через Artifact Hub
+```bash
+helm repo add wb-responder https://eslazarev.github.io/ai-wildberries-review-responder
+helm repo update
+helm install wb-responder wb-responder/ai-wildberries-review-responder \
+  --namespace wb-responder --create-namespace \
+  --set secrets.wildberriesApiToken=$WILDBERRIES_API_TOKEN \
+  --set secrets.llmApiKey=$LLM_API_KEY
+```
+Проверка и ручной запуск:
+```bash
+kubectl get cronjob,configmap,secret -n wb-responder
+kubectl create job --from=cronjob/wb-responder-ai-wildberries-review-responder manual -n wb-responder
+kubectl logs -n wb-responder -l app.kubernetes.io/instance=wb-responder --tail=200 -f
+```
+
+### Параметры values.yaml
+- `cronjob.schedule` — cron-выражение, по умолчанию `*/30 * * * *`.
+- `secrets.existingSecret` — использовать заранее созданный `Secret` с ключами `WILDBERRIES__API_TOKEN` и `LLM__API_KEY` вместо встроенного.
+- `settings.content` — полный YAML, который будет смонтирован как `/app/settings.yaml`. Удобно править промпты, базовые URL и таймауты прямо из релиза.
+- `settings.existingConfigMap` — альтернатива: использовать существующий ConfigMap с ключом `settings.yaml`.
+- `extraEnv` / `extraEnvFrom` — пробросить дополнительные переменные (например, `LLM__BASE_URL` на in-cluster Ollama).
+- `resources`, `nodeSelector`, `tolerations`, `affinity`, `podSecurityContext` — стандартный набор для тонкой настройки пода.
+
+Полный список параметров и примеры — в [`charts/ai-wildberries-review-responder/README.md`](charts/ai-wildberries-review-responder/README.md). Pod по умолчанию запускается non-root с read-only rootfs и сброшенными capabilities.
 
 ## Архитектура и внутреннее устройство
 
