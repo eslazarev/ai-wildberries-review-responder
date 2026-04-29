@@ -1,0 +1,46 @@
+apiVersion: v2
+name: ai-wildberries-review-responder
+description: AI-powered auto-responder for Wildberries marketplace customer reviews. Fetches unanswered reviews, generates replies via LLM (YandexGPT, OpenAI, or any OpenAI-compatible API including local Ollama), and publishes them back via Wildberries Feedbacks API.
+type: application
+version: 0.1.0
+appVersion: "latest"
+home: https://github.com/eslazarev/ai-wildberries-review-responder
+icon: https://raw.githubusercontent.com/eslazarev/ai-wildberries-review-responder/main/.github/images/wildberries-ai-review-service.gif
+sources:
+  - https://github.com/eslazarev/ai-wildberries-review-responder
+keywords:
+  - wildberries
+  - ai
+  - llm
+  - openai
+  - yandexgpt
+  - ollama
+  - marketplace
+  - ecommerce
+  - review-automation
+  - customer-support
+  - chatgpt
+maintainers:
+  - name: Evgenii Lazarev
+    url: https://github.com/eslazarev
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: GitHub repository
+      url: https://github.com/eslazarev/ai-wildberries-review-responder
+    - name: Docker Hub image
+      url: https://hub.docker.com/r/eslazarev/ai-wildberries-review-responder
+    - name: Issue tracker
+      url: https://github.com/eslazarev/ai-wildberries-review-responder/issues
+  artifacthub.io/maintainers: |
+    - name: Evgenii Lazarev
+      email: elazarev@gmail.com
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial Helm chart release with CronJob, ConfigMap and Secret templates
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/images: |
+    - name: ai-wildberries-review-responder
+      image: docker.io/eslazarev/ai-wildberries-review-responder:latest

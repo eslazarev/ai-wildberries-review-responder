@@ -1,0 +1,11 @@
+{{- if and .Values.settings.create (not .Values.settings.existingConfigMap) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "wb-responder.configMapName" . }}
+  labels:
+    {{- include "wb-responder.labels" . | nindent 4 }}
+data:
+  settings.yaml: |
+{{ toYaml .Values.settings.content | indent 4 }}
+{{- end -}}
