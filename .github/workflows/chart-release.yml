@@ -1,0 +1,97 @@
+name: Release Helm chart
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'charts/**'
+      - '.github/workflows/chart-release.yml'
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump kind'
+        required: false
+        default: 'patch'
+        type: choice
+        options: [patch, minor, major, none]
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Bump chart version if unchanged
+        id: bump
+        env:
+          BUMP_KIND: ${{ github.event.inputs.bump || 'patch' }}
+        run: |
+          set -euo pipefail
+          chart_dir="charts/ai-wildberries-review-responder"
+          chart_file="$chart_dir/Chart.yaml"
+          name=$(yq '.name' "$chart_file")
+          cur=$(yq '.version' "$chart_file")
+          last_tag=$(git tag --list "${name}-*" --sort=-v:refname | head -n1 || true)
+          last_ver="${last_tag#${name}-}"
+          echo "current_version=$cur" >> "$GITHUB_OUTPUT"
+          echo "last_released_version=${last_ver:-none}" >> "$GITHUB_OUTPUT"
+          if [ "${BUMP_KIND}" = "none" ]; then
+            echo "Bump skipped via workflow_dispatch input."
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -n "$last_ver" ] && [ "$cur" != "$last_ver" ]; then
+            echo "Chart version already bumped manually: $last_ver -> $cur. Skipping auto-bump."
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          IFS=. read -r major minor patch <<< "$cur"
+          case "$BUMP_KIND" in
+            major) new="$((major + 1)).0.0" ;;
+            minor) new="${major}.$((minor + 1)).0" ;;
+            patch) new="${major}.${minor}.$((patch + 1))" ;;
+            *) echo "Unknown BUMP_KIND=$BUMP_KIND"; exit 1 ;;
+          esac
+          echo "Bumping $name from $cur to $new ($BUMP_KIND)"
+          yq -i ".version = \"$new\"" "$chart_file"
+          git add "$chart_file"
+          git commit -m "chore(chart): bump $name to $new [skip ci]"
+          git push origin HEAD:${GITHUB_REF#refs/heads/}
+          echo "new_version=$new" >> "$GITHUB_OUTPUT"
+          echo "bumped=true" >> "$GITHUB_OUTPUT"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+
+      - name: Lint chart
+        run: helm lint charts/ai-wildberries-review-responder --set secrets.wildberriesApiToken=ci-test
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.7.0
+        with:
+          charts_dir: charts
+          mark_as_latest: "true"
+          pages_branch: gh-pages
+        env:
+          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}

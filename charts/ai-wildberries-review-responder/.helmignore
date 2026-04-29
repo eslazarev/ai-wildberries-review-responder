@@ -1,0 +1,14 @@
+.DS_Store
+.git/
+.gitignore
+.idea/
+.vscode/
+*.tgz
+*.tmproj
+*.swp
+*.bak
+*.tmp
+*.orig
+.project
+.tox/
+OWNERS

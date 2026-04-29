@@ -1,0 +1,96 @@
+image:
+  repository: eslazarev/ai-wildberries-review-responder
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+cronjob:
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  startingDeadlineSeconds: 120
+  restartPolicy: OnFailure
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 3600
+  activeDeadlineSeconds: 300
+
+# Override container command. Default runs a single iteration via docker_once,
+# which fits Kubernetes-native CronJob better than the in-container APScheduler.
+command:
+  - python
+  - -m
+  - src.entrypoints.docker_once
+
+# Wildberries API token. Provide via .secrets.wildberriesApiToken or via
+# .secrets.existingSecret pointing to a pre-created Secret with key WILDBERRIES__API_TOKEN.
+secrets:
+  create: true
+  existingSecret: ""
+  wildberriesApiToken: ""
+  llmApiKey: ""
+
+# Settings rendered into a ConfigMap and mounted as /app/settings.yaml.
+# Set settings.create=false to use the image's bundled settings.yaml.
+settings:
+  create: true
+  existingConfigMap: ""
+  content:
+    wildberries:
+      base_url: "https://feedbacks-api.wildberries.ru"
+      request_timeout: 10
+      batch_size: 10
+      check_every_minutes: 30
+    llm:
+      model: "gpt-4o-mini"
+      base_url: "https://api.openai.com/v1"
+      temperature: 0.3
+      max_tokens: 600
+      timeout: 10
+      instructions: |
+        Ты — вежливый сотрудник поддержки реселлера, отвечающий на отзывы Wildberries.
+      prompt_template: |
+        Отвечай на отзыв Wildberries на том же языке, что и отзыв.
+        Тон: дружелюбный, лаконичный, полезный. До 600 символов.
+        Ты не работаешь в Wildberries, не упоминай компанию в ответе.
+        Не используй эмодзи.
+
+extraEnv: []
+extraEnvFrom: []
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+podAnnotations: {}
+podLabels: {}
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}

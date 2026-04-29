@@ -1,0 +1,16 @@
+{{ include "wb-responder.fullname" . }} installed.
+
+CronJob schedule: {{ .Values.cronjob.schedule }}
+Image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+
+Inspect:
+  kubectl get cronjob {{ include "wb-responder.fullname" . }} -n {{ .Release.Namespace }}
+  kubectl get jobs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+Trigger a manual run:
+  kubectl create job --from=cronjob/{{ include "wb-responder.fullname" . }} {{ include "wb-responder.fullname" . }}-manual -n {{ .Release.Namespace }}
+
+Tail logs of the latest run:
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }} --tail=200 -f
+
+Repository: https://github.com/eslazarev/ai-wildberries-review-responder

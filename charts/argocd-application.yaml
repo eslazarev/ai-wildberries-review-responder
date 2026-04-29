@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wb-responder
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/eslazarev/ai-wildberries-review-responder.git
+    targetRevision: HEAD
+    path: charts/ai-wildberries-review-responder
+    helm:
+      releaseName: wb-responder
+      values: |
+        secrets:
+          wildberriesApiToken: "fake-wb-token-for-testing"
+          llmApiKey: "fake-llm-key"
+        image:
+          pullPolicy: Never
+        cronjob:
+          schedule: "*/10 * * * *"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: wb-responder
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true
