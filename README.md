@@ -1,4 +1,7 @@
 # Сервис ответов на отзывы покупателей на Wildberries с помощью AI
+
+🌐 **Русский** · [English](docs/i18n/README.en.md) · [简体中文](docs/i18n/README.zh-CN.md) · [Türkçe](docs/i18n/README.tr.md) · [Қазақша](docs/i18n/README.kk.md) · [Oʻzbekcha](docs/i18n/README.uz.md)
+
 <img src="https://raw.githubusercontent.com/eslazarev/ai-wildberries-review-responder/main/.github/images/wildberries-ai-review-service.gif">
 
 ![CI](https://github.com/eslazarev/ai-wildberries-review-responder/actions/workflows/ci.yml/badge.svg)
