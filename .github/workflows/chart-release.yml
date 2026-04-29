@@ -124,3 +124,30 @@ jobs:
           pages_branch: gh-pages
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish artifacthub-repo.yml to gh-pages root
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          src="charts/artifacthub-repo.yml"
+          if [ ! -f "$src" ]; then
+            echo "$src not found; skipping ArtifactHub repo metadata publish."
+            exit 0
+          fi
+          tmp=$(mktemp -d)
+          git worktree add "$tmp" gh-pages
+          (
+            cd "$tmp"
+            cp "$GITHUB_WORKSPACE/$src" artifacthub-repo.yml
+            if git diff --quiet -- artifacthub-repo.yml && git ls-files --error-unmatch artifacthub-repo.yml >/dev/null 2>&1; then
+              echo "artifacthub-repo.yml unchanged; skipping commit."
+              exit 0
+            fi
+            git add artifacthub-repo.yml
+            git -c user.name="github-actions[bot]" \
+                -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+                commit -m "chore: publish artifacthub-repo.yml"
+            git push origin gh-pages
+          )
+          git worktree remove --force "$tmp"
