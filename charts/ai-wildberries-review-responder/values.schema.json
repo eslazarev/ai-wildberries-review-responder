@@ -1,0 +1,205 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ai-wildberries-review-responder values",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Container image repository (without tag)."
+        },
+        "tag": {
+          "type": "string",
+          "description": "Image tag. Empty string falls back to Chart.appVersion."
+        },
+        "pullPolicy": {
+          "type": "string",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "description": "Kubernetes imagePullPolicy."
+        }
+      }
+    },
+    "imagePullSecrets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "nameOverride": { "type": "string" },
+    "fullnameOverride": { "type": "string" },
+    "cronjob": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schedule": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Cron expression. Default: every 30 minutes."
+        },
+        "concurrencyPolicy": {
+          "type": "string",
+          "enum": ["Allow", "Forbid", "Replace"]
+        },
+        "successfulJobsHistoryLimit": { "type": "integer", "minimum": 0 },
+        "failedJobsHistoryLimit": { "type": "integer", "minimum": 0 },
+        "startingDeadlineSeconds": { "type": "integer", "minimum": 0 },
+        "restartPolicy": {
+          "type": "string",
+          "enum": ["OnFailure", "Never"]
+        },
+        "backoffLimit": { "type": "integer", "minimum": 0 },
+        "ttlSecondsAfterFinished": { "type": "integer", "minimum": 0 },
+        "activeDeadlineSeconds": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "command": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Container entrypoint command override."
+    },
+    "secrets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "create": {
+          "type": "boolean",
+          "description": "Create the credentials Secret. Set false to use existingSecret."
+        },
+        "existingSecret": {
+          "type": "string",
+          "description": "Name of a pre-existing Secret with WILDBERRIES__API_TOKEN and (optionally) LLM__API_KEY keys."
+        },
+        "wildberriesApiToken": {
+          "type": "string",
+          "description": "Wildberries Feedbacks API token. Required when create=true and existingSecret is empty."
+        },
+        "llmApiKey": {
+          "type": "string",
+          "description": "LLM API key. Optional in Yandex Cloud Functions where IAM token is used."
+        }
+      }
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "create": {
+          "type": "boolean",
+          "description": "Render settings.yaml into a ConfigMap."
+        },
+        "existingConfigMap": {
+          "type": "string",
+          "description": "Name of a pre-existing ConfigMap with a settings.yaml key."
+        },
+        "content": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Inline settings.yaml content. Forwarded as YAML to /app/settings.yaml.",
+          "properties": {
+            "wildberries": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "base_url": { "type": "string", "format": "uri" },
+                "request_timeout": { "type": "integer", "minimum": 1 },
+                "batch_size": { "type": "integer", "minimum": 1 },
+                "check_every_minutes": { "type": "integer", "minimum": 1 }
+              }
+            },
+            "llm": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "model": { "type": "string", "minLength": 1 },
+                "base_url": { "type": "string", "format": "uri" },
+                "temperature": { "type": "number", "minimum": 0, "maximum": 2 },
+                "max_tokens": { "type": "integer", "minimum": 1 },
+                "timeout": { "type": "integer", "minimum": 1 },
+                "instructions": { "type": "string" },
+                "prompt_template": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "extraEnv": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Extra environment variables passed to the container."
+    },
+    "extraEnvFrom": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requests": { "$ref": "#/definitions/resourceList" },
+        "limits": { "$ref": "#/definitions/resourceList" }
+      }
+    },
+    "podSecurityContext": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "securityContext": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "nodeSelector": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "tolerations": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "affinity": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "podAnnotations": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "podLabels": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "serviceAccount": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "create": { "type": "boolean" },
+        "name": { "type": "string" },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "resourceList": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpu": { "type": ["string", "number"] },
+        "memory": { "type": "string" },
+        "ephemeral-storage": { "type": "string" }
+      }
+    }
+  }
+}
