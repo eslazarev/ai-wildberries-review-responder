@@ -135,10 +135,15 @@ jobs:
             echo "$src not found; skipping ArtifactHub repo metadata publish."
             exit 0
           fi
+          # chart-releaser may have pushed to gh-pages from its own worktree just
+          # before us, leaving the local ref stale. Re-fetch and align with the
+          # latest origin/gh-pages before committing on top.
+          git fetch origin gh-pages
           tmp=$(mktemp -d)
           git worktree add "$tmp" gh-pages
           (
             cd "$tmp"
+            git reset --hard origin/gh-pages
             cp "$GITHUB_WORKSPACE/$src" artifacthub-repo.yml
             if git diff --quiet -- artifacthub-repo.yml && git ls-files --error-unmatch artifacthub-repo.yml >/dev/null 2>&1; then
               echo "artifacthub-repo.yml unchanged; skipping commit."
