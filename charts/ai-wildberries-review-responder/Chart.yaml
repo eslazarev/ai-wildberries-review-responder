@@ -2,7 +2,7 @@ apiVersion: v2
 name: ai-wildberries-review-responder
 description: AI-powered auto-responder for Wildberries marketplace customer reviews. Fetches unanswered reviews, generates replies via LLM (YandexGPT, OpenAI, or any OpenAI-compatible API including local Ollama), and publishes them back via Wildberries Feedbacks API.
 type: application
-version: 0.1.5
+version: 0.1.6
 appVersion: "latest"
 home: https://github.com/eslazarev/ai-wildberries-review-responder
 icon: https://raw.githubusercontent.com/eslazarev/ai-wildberries-review-responder/main/.github/images/wildberries-ai-review-service.gif
