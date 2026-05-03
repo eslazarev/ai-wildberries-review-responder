@@ -1,5 +1,5 @@
 pydantic>=2.13.3
-pydantic-settings>=2.2
+pydantic-settings>=2.14.0
 PyYAML>=6.0.3
 requests>=2.33.0
 wildberries-sdk>=0.1.20
