@@ -1,2 +1,2 @@
 -r requirements.txt
-APScheduler>=3.10
+APScheduler>=3.11.2
